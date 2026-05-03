@@ -1,0 +1,1 @@
+self.__NEXT_FONT_MANIFEST="{\"pages\":{},\"app\":{\"/Users/ks/井上組/app/layout\":[\"static/media/24f6ebe2756575bd-s.p.woff2\",\"static/media/bd9b9909c3a641ff-s.p.woff2\"]},\"appUsingSizeAdjust\":true,\"pagesUsingSizeAdjust\":false}"
