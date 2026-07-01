@@ -2,12 +2,19 @@
 
 set -u
 
-# このスクリプト自身が置かれているフォルダを自動的にプロジェクトの場所にします。
-# フォルダごと移動・名前変更しても、そのまま動きます。
-PROJECT_DIR="${0:A:h}"
+# === プロジェクトの場所を自動判別 ===
+# 1) このファイルと同じフォルダに package.json があれば、そこをプロジェクトとみなす
+# 2) なければ、既知の場所（/Users/ks/Documents/井上組）を使う
+SCRIPT_DIR="${0:A:h}"
+if [ -f "${SCRIPT_DIR}/package.json" ]; then
+  PROJECT_DIR="${SCRIPT_DIR}"
+else
+  PROJECT_DIR="/Users/ks/Documents/井上組"
+fi
+
 PORT="3001"
 URL="http://localhost:${PORT}"
-# 以前のロックされたファイル名を避けて、新しい名前で記録します。
+# 以前のロックされたファイル名を避け、新しい名前で記録します。
 LOG_FILE="${PROJECT_DIR}/dev-server.log"
 PID_FILE="${PROJECT_DIR}/dev-server.pid"
 
@@ -18,7 +25,7 @@ echo "URL: ${URL}"
 echo ""
 
 cd "${PROJECT_DIR}" || {
-  echo "プロジェクトフォルダが見つかりません。"
+  echo "プロジェクトフォルダが見つかりません: ${PROJECT_DIR}"
   read -r "?Enterキーで閉じます..."
   exit 1
 }
@@ -32,32 +39,21 @@ if [ ! -d "node_modules" ]; then
   }
 fi
 
+# すでに起動中ならブラウザを開くだけ
 if curl -fsS "${URL}" >/dev/null 2>&1; then
   echo "既に ${URL} で起動しています。ブラウザを開きます。"
   open "${URL}"
-  echo ""
-  echo "既に別ウィンドウでサーバーが動いています。"
   if [ -t 0 ]; then
     read -r "?Enterキーで閉じます..."
   fi
   exit 0
 fi
 
-if [ -f "${PID_FILE}" ]; then
-  OLD_PID="$(cat "${PID_FILE}")"
-  if kill -0 "${OLD_PID}" >/dev/null 2>&1; then
-    echo "古い起動プロセスを停止しています。"
-    kill "${OLD_PID}" >/dev/null 2>&1
-    sleep 1
-  fi
-  rm -f "${PID_FILE}"
-fi
-
 echo "Next.js 開発サーバーを起動します。"
 echo "ブラウザはサーバー準備後に自動で開きます。"
 echo ""
 
-# ポートを使っている古いプロセスがあれば停止します。
+# ポートを使っている古いプロセスがあれば停止
 PORT_PIDS="$(lsof -ti tcp:${PORT} 2>/dev/null || true)"
 if [ -n "${PORT_PIDS}" ]; then
   echo "${PORT}番ポートの古いプロセスを停止します。"
@@ -67,15 +63,15 @@ if [ -n "${PORT_PIDS}" ]; then
   sleep 1
 fi
 
-# 新しいビルド用フォルダを掃除（ロックされた古い .next は触りません）。
+# 新しいビルド用フォルダを掃除（ロックされた古い .next は触りません）
 rm -rf "${PROJECT_DIR}/.next-dev" 2>/dev/null
 
 npm run dev -- --hostname 127.0.0.1 --port "${PORT}" > "${LOG_FILE}" 2>&1 &
 SERVER_PID="$!"
-echo "${SERVER_PID}" > "${PID_FILE}"
+echo "${SERVER_PID}" > "${PID_FILE}" 2>/dev/null
 
-echo "起動待機中..."
-for i in {1..40}; do
+echo "起動待機中...（初回は十数秒かかることがあります）"
+for i in {1..60}; do
   if curl -fsS "${URL}" >/dev/null 2>&1; then
     echo "起動しました: ${URL}"
     open "${URL}"
@@ -84,7 +80,7 @@ for i in {1..40}; do
     echo "停止するときは「井上組サイト_停止.command」を使ってください。"
     echo ""
     wait "${SERVER_PID}"
-    rm -f "${PID_FILE}"
+    rm -f "${PID_FILE}" 2>/dev/null
     echo "サーバーが停止しました。"
     if [ -t 0 ]; then
       read -r "?Enterキーで閉じます..."
@@ -96,7 +92,7 @@ done
 
 echo "起動確認ができませんでした。ログを表示します。"
 echo "--------------------------------"
-tail -80 "${LOG_FILE}"
+tail -80 "${LOG_FILE}" 2>/dev/null
 echo "--------------------------------"
 if [ -t 0 ]; then
   read -r "?Enterキーで閉じます..."

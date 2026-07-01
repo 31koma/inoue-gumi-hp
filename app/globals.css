@@ -4,7 +4,9 @@
 
 :root {
   color-scheme: dark;
-  background: #07080a;
+  --paper: #f6f4ee;
+  --ink: #0b0c0e;
+  scroll-padding-top: 5rem; /* 固定ヘッダー分のアンカー補正 */
 }
 
 * {
@@ -13,164 +15,76 @@
 
 html {
   scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
 }
 
 body {
   margin: 0;
   min-height: 100vh;
   overflow-x: hidden;
-  background:
-    radial-gradient(circle at 50% 8%, rgba(255, 255, 255, 0.08), transparent 32rem),
-    linear-gradient(120deg, #050607 0%, #0b0d10 58%, #151515 100%);
-  color: #f6f2ea;
+  background: var(--ink);
+  color: #ece9e1;
   font-family: var(--font-body), sans-serif;
+  line-height: 1.85;
 }
 
 ::selection {
-  background: #f7c600;
-  color: #07080a;
+  background: #c2a15b;
+  color: #0b0c0e;
 }
 
-.noise-layer {
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 240 240' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.35'/%3E%3C/svg%3E");
+/* アクセシビリティ：キーボードフォーカスを明示 */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible {
+  outline: 2px solid #dcc389;
+  outline-offset: 3px;
 }
 
-.clip-slab {
-  clip-path: polygon(0 0, 100% 0, 95% 100%, 0 100%);
+/* 動きを抑える設定のユーザーへの配慮 */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    transition-duration: 0.001ms !important;
+  }
 }
 
-.construction-grid {
+/* 微細な建設グリッド（背景演出） */
+.bg-grid {
   background-image:
-    linear-gradient(rgba(246, 242, 234, 0.035) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(246, 242, 234, 0.035) 1px, transparent 1px);
-  background-size: 72px 72px;
+    linear-gradient(rgba(246, 244, 238, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(246, 244, 238, 0.04) 1px, transparent 1px);
+  background-size: 80px 80px;
 }
 
-.metal-stage {
-  background:
-    radial-gradient(circle at 50% 42%, rgba(255, 255, 255, 0.2), transparent 32rem),
-    linear-gradient(180deg, rgba(5, 6, 8, 0.96) 0%, rgba(12, 14, 17, 0.68) 46%, rgba(5, 6, 8, 0.98) 100%),
-    linear-gradient(120deg, #030405 0%, #161a1f 46%, #050608 100%);
+/* ゴールドの細いヘアライン */
+.brass-rule {
+  background: linear-gradient(90deg, transparent, #c2a15b, transparent);
 }
 
-.metal-texture {
-  background-image: url("/images/metal-hairline.png");
-  background-size: cover;
-  background-position: center;
-  filter: grayscale(1) contrast(1.35) brightness(0.42);
+/* 画像の上に重ねる暗幕グラデーション */
+.media-scrim {
+  background: linear-gradient(
+    180deg,
+    rgba(11, 12, 14, 0.2) 0%,
+    rgba(11, 12, 14, 0.55) 55%,
+    rgba(11, 12, 14, 0.92) 100%
+  );
 }
 
-.structure-shadow {
-  background-image: url("/images/dark-structure.png");
-  background-size: cover;
-  background-position: center 28%;
-  filter: grayscale(1) contrast(1.18) brightness(0.34);
+/* 本文用リッチテキスト（お知らせ記事など） */
+.prose-jp p {
+  margin: 0 0 1.4em;
+  color: rgba(236, 233, 225, 0.82);
 }
-
-.particle-field {
-  background-image:
-    radial-gradient(circle, rgba(255, 255, 255, 0.32) 0 1px, transparent 1.5px),
-    radial-gradient(circle, rgba(247, 198, 0, 0.12) 0 1px, transparent 1.5px);
-  background-position: 0 0, 34px 22px;
-  background-size: 110px 110px, 154px 154px;
-}
-
-.craftsman-silhouette {
-  position: absolute;
-  right: clamp(1rem, 7vw, 7rem);
-  bottom: 5.5rem;
-  width: clamp(10rem, 18vw, 17rem);
-  height: clamp(17rem, 32vw, 30rem);
-  opacity: 0.22;
-  filter: blur(0.2px);
-}
-
-.cinematic-vignette {
-  background:
-    linear-gradient(90deg, #07080a 0%, rgba(7, 8, 10, 0.52) 34%, rgba(7, 8, 10, 0.9) 100%),
-    radial-gradient(circle at 50% 48%, transparent 0%, rgba(0, 0, 0, 0.44) 58%, rgba(0, 0, 0, 0.86) 100%);
-}
-
-.craftsman-silhouette::before {
-  content: "";
-  position: absolute;
-  left: 50%;
-  top: 0;
-  width: 28%;
-  aspect-ratio: 1;
-  transform: translateX(-50%);
-  border-radius: 999px;
-  background: #020304;
-  box-shadow: 0 -0.9rem 0 -0.35rem #020304;
-}
-
-.craftsman-silhouette::after {
-  content: "";
-  position: absolute;
-  left: 50%;
-  top: 17%;
-  width: 42%;
-  height: 42%;
-  transform: translateX(-50%);
-  border-radius: 42% 42% 20% 20%;
-  background: #020304;
-  box-shadow:
-    -3.8rem 1.2rem 0 -2.1rem #020304,
-    3.8rem 1.2rem 0 -2.1rem #020304,
-    -1.8rem 8.2rem 0 -1.1rem #020304,
-    1.8rem 8.2rem 0 -1.1rem #020304;
-}
-
-.model-frame::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.1), transparent 24%),
-    radial-gradient(circle at 50% 30%, rgba(247, 198, 0, 0.12), transparent 18rem);
-  mix-blend-mode: screen;
-}
-
-.runway-worker {
-  position: absolute;
-  left: 50%;
-  bottom: 4.5rem;
-  width: min(54%, 15rem);
-  height: 74%;
-  transform: translateX(-50%);
-  opacity: 0.92;
-  filter: drop-shadow(0 2.5rem 3rem rgba(0, 0, 0, 0.75));
-}
-
-.runway-worker::before {
-  content: "";
-  position: absolute;
-  left: 50%;
-  top: 0;
-  width: 22%;
-  aspect-ratio: 1;
-  transform: translateX(-50%);
-  border-radius: 999px;
-  background: linear-gradient(180deg, #151515, #010101);
-  box-shadow: 0 -0.75rem 0 -0.35rem #050505;
-}
-
-.runway-worker::after {
-  content: "";
-  position: absolute;
-  left: 50%;
-  top: 14%;
-  width: 44%;
-  height: 68%;
-  transform: translateX(-50%);
-  border-radius: 42% 42% 10% 10%;
-  background:
-    linear-gradient(90deg, transparent 0 18%, rgba(255, 255, 255, 0.08) 19% 22%, transparent 23%),
-    linear-gradient(180deg, #101010 0%, #020202 100%);
-  box-shadow:
-    -4.6rem 1.9rem 0 -2.2rem #050505,
-    4.6rem 1.9rem 0 -2.2rem #050505,
-    -2rem 13.5rem 0 -1.15rem #030303,
-    2rem 13.5rem 0 -1.15rem #030303;
+.prose-jp p:last-child {
+  margin-bottom: 0;
 }

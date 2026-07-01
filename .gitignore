@@ -1,2 +1,8 @@
 node_modules/
 .DS_Store
+.next/
+.next-dev/
+dev-server.log
+dev-server.pid
+inoue-gumi-site.log
+inoue-gumi-site.pid

@@ -1,460 +1,351 @@
-"use client";
+import Link from "next/link";
+import Image from "next/image";
+import { ArrowRight, ArrowUpRight, MapPin, ShieldCheck, Award, Clock } from "lucide-react";
+import { Reveal } from "@/components/reveal";
+import { CountUp } from "@/components/count-up";
+import { SectionHeading } from "@/components/section-heading";
+import { CtaSection } from "@/components/cta-section";
+import { PhotoPlaceholder } from "@/components/photo-placeholder";
+import { services } from "@/lib/services";
+import { works } from "@/lib/works";
+import { site } from "@/lib/site";
 
-import { useRef, useState } from "react";
-import { motion, useScroll, useTransform } from "framer-motion";
-import {
-  ArrowUpRight,
-  Building2,
-  CheckCircle2,
-  HardHat,
-  Pause,
-  Play,
-  ShieldCheck,
-  Volume2,
-  Wrench
-} from "lucide-react";
-
-const navItems = ["Home", "Services", "About", "Contact"];
-
-const trustCards = [
-  {
-    icon: Building2,
-    title: "PLAN",
-    text: "現場を読み、足場を組む。"
-  },
-  {
-    icon: HardHat,
-    title: "SAFETY",
-    text: "安全は、見た目に出る。"
-  },
-  {
-    icon: Wrench,
-    title: "BUILD",
-    text: "単管も、くさび式も。"
-  },
-  {
-    icon: ShieldCheck,
-    title: "STRIKE",
-    text: "撤収まで、現場品質。"
-  }
+const stats = [
+  { label: "対応エリア", value: 1, suffix: "京都府全域", isText: true },
+  { label: "施工実績", value: 1200, suffix: "件以上", isText: false },
+  { label: "無事故記録", value: 100, suffix: "%安全第一", isText: false },
+  { label: "保有資格", value: 1, suffix: "一級とび技能士", isText: true },
 ];
-
-const services = ["単管足場", "くさび式足場", "ビケ足場", "IQ部材", "計画", "撤収"];
-const looks = ["SAFETY", "RELIABILITY", "FULL SUPPORT"];
-const lookImages = [
-  { src: "/images/look-worker.png", alt: "井上組の職人ポートレート" },
-  { src: "/images/look-hands.png", alt: "足場部材を締める手元" },
-  { src: "/images/look-site.png", alt: "足場が組まれた建設現場" }
-];
-
-const reveal = {
-  hidden: { opacity: 0, y: 28 },
-  visible: { opacity: 1, y: 0 }
-};
 
 export default function Home() {
-  const { scrollYProgress } = useScroll();
-  const heroY = useTransform(scrollYProgress, [0, 0.32], ["0%", "3%"]);
-  const beamX = useTransform(scrollYProgress, [0, 1], ["-8%", "8%"]);
-
   return (
-    <main className="min-h-screen bg-iron text-[#f8f7f2]">
-      <SiteNav />
-      <MusicController />
+    <>
+      {/* ① ② ヒーロー + 新キャッチコピー */}
+      <section className="relative flex min-h-[100svh] items-center overflow-hidden">
+        <Image
+          src="/images/hero-scaffold.png"
+          alt="京都の建設現場に組まれた井上組の足場"
+          fill
+          priority
+          sizes="100vw"
+          className="object-cover"
+          style={{ filter: "grayscale(0.35) brightness(0.55)" }}
+        />
+        <div className="absolute inset-0 media-scrim" aria-hidden="true" />
+        <div className="bg-grid absolute inset-0 opacity-60" aria-hidden="true" />
 
-      <section id="home" className="relative h-screen min-h-screen overflow-hidden">
-        <motion.div
-          className="absolute inset-0 z-0"
-          style={{ y: heroY }}
-          aria-hidden="true"
-        >
-          <HeroImageStage />
-        </motion.div>
-
-        <div className="relative z-10 flex h-screen min-h-screen items-center justify-center px-6 text-center sm:px-10 lg:px-16">
-          <div className="mx-auto max-w-5xl">
-            <motion.h1
-              initial={{ opacity: 0, y: 24 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.75, ease: [0.22, 1, 0.36, 1] }}
-              className="font-display text-[7rem] font-bold leading-none tracking-normal text-white sm:text-[11rem] lg:text-[16rem]"
-            >
-              組む。
-            </motion.h1>
-            <motion.p
-              initial={{ opacity: 0, y: 18 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.16, duration: 0.65, ease: [0.22, 1, 0.36, 1] }}
-              className="mt-6 text-lg font-bold text-white/76 sm:text-2xl"
-            >
-              Invisible work. Visible trust.
-            </motion.p>
-            <motion.div
-              initial={{ opacity: 0, y: 18 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.28, duration: 0.65, ease: [0.22, 1, 0.36, 1] }}
-              className="mt-12 flex flex-col items-center justify-center gap-4 sm:flex-row"
-            >
-              <a
-                href="#contact"
-                className="bg-white px-8 py-4 text-sm font-black tracking-[0.14em] text-iron transition hover:bg-signal"
-              >
-                採用を見る
-              </a>
-              <a
-                href="#services"
-                className="bg-signal px-8 py-4 text-sm font-black tracking-[0.14em] text-iron transition hover:bg-white"
-              >
-                実績を見る
-              </a>
-            </motion.div>
-          </div>
-        </div>
-      </section>
-
-      <motion.div
-        className="pointer-events-none fixed inset-y-0 left-1/2 z-20 hidden w-20 bg-signal/8 blur-2xl lg:block"
-        style={{ x: beamX }}
-        aria-hidden="true"
-      />
-
-      <LookSection />
-
-      <SectionShell id="services" eyebrow="Services" title="Plan. Build. Strike.">
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {services.map((service, index) => (
-            <BuildBlock key={service} delay={index * 0.06}>
-              <div className="group flex min-h-52 items-end justify-between border border-white/10 bg-white/[0.025] p-8 transition hover:border-signal/70 hover:bg-white/[0.055]">
-                <span className="max-w-[12rem] text-4xl font-black leading-none">{service}</span>
-                <ArrowUpRight className="h-6 w-6 text-signal transition group-hover:translate-x-1 group-hover:-translate-y-1" />
-              </div>
-            </BuildBlock>
-          ))}
-        </div>
-      </SectionShell>
-
-      <section className="bg-black px-6 py-32 sm:px-10 lg:px-16 lg:py-44">
-        <div className="mx-auto max-w-7xl">
-          <BuildBlock>
-            <div className="mb-20 max-w-5xl">
-              <p className="text-sm font-black uppercase tracking-[0.34em] text-signal">Crew</p>
-              <h2 className="mt-8 font-display text-7xl font-bold leading-[0.88] text-white sm:text-8xl lg:text-[10rem]">
-                WORKERS
-                <br />
-                AS ICONS.
-              </h2>
-            </div>
-          </BuildBlock>
-
-          <div className="grid gap-6 lg:grid-cols-3">
-            {looks.map((look, index) => (
-              <BuildBlock key={look} delay={index * 0.08}>
-                <div className="model-frame group relative min-h-[34rem] overflow-hidden border border-white/10 bg-[#08090b]">
-                  <div className="structure-shadow absolute inset-0 opacity-18 transition duration-700 group-hover:scale-105 group-hover:opacity-24" />
-                  <div className="metal-texture absolute inset-0 opacity-20 mix-blend-screen" />
-                  <div className="runway-worker" />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black via-black/18 to-transparent" />
-                  <div className="absolute bottom-0 left-0 right-0 p-8">
-                    <p className="font-display text-5xl font-bold leading-none text-white">{look}</p>
-                    <p className="mt-4 text-xs font-black uppercase tracking-[0.3em] text-signal">
-                      Inoue Gumi
-                    </p>
-                  </div>
-                </div>
-              </BuildBlock>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <section id="about" className="construction-grid border-y border-white/10 bg-[#090a0c] px-6 py-32 sm:px-10 lg:px-16 lg:py-44">
-        <div className="mx-auto grid max-w-7xl gap-20 lg:grid-cols-[0.82fr_1.18fr] lg:items-start">
-          <motion.div
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, amount: 0.35 }}
-            variants={reveal}
-            transition={{ duration: 0.7 }}
-            className="lg:sticky lg:top-28"
-          >
-            <p className="text-sm font-black uppercase tracking-[0.34em] text-signal">Trust</p>
-            <h2 className="mt-8 font-display text-7xl font-bold leading-[0.9] text-white sm:text-8xl lg:text-9xl">
-              SAFETY
-              <br />
-              IS STYLE.
-            </h2>
-            <p className="mt-10 max-w-xl text-lg font-bold leading-9 text-white/70">
-              段取り、声掛け、撤収まで。信頼は細部で決まる。
+        <div className="relative mx-auto w-full max-w-content px-5 pt-24 sm:px-8 lg:px-12">
+          <Reveal>
+            <p className="font-display text-xs uppercase tracking-widest2 text-brass sm:text-sm">
+              Tobi &amp; Scaffolding · Kyoto
             </p>
-          </motion.div>
+          </Reveal>
+          <Reveal delay={0.1}>
+            <h1 className="mt-6 font-serif text-[2.7rem] font-bold leading-[1.15] text-white sm:text-6xl lg:text-7xl">
+              確かな足場で、
+              <br />
+              未来を支える。
+            </h1>
+          </Reveal>
+          <Reveal delay={0.2}>
+            <p className="mt-7 max-w-xl text-base leading-8 text-white/85 sm:text-lg">
+              京都を拠点とする鳶・足場工事の専門会社、株式会社井上組。
+              一級とび技能士の技術と、最後まで気を抜かない仕事で、
+              現場の安全と品質を足元から支えます。
+            </p>
+          </Reveal>
+          <Reveal delay={0.3}>
+            <div className="mt-10 flex flex-col gap-4 sm:flex-row">
+              <Link
+                href="/services"
+                className="group flex items-center justify-center gap-2 bg-brass px-8 py-4 text-sm font-black text-ink transition hover:bg-brass-light"
+              >
+                事業内容を見る
+                <ArrowRight className="h-4 w-4 transition group-hover:translate-x-1" />
+              </Link>
+              <Link
+                href="/recruit"
+                className="flex items-center justify-center gap-2 border border-white/40 px-8 py-4 text-sm font-black text-white transition hover:border-brass hover:text-brass"
+              >
+                採用情報を見る
+              </Link>
+            </div>
+          </Reveal>
+        </div>
 
-          <div className="grid gap-6 sm:grid-cols-2">
-            {trustCards.map((card, index) => (
-              <BuildBlock key={card.title} delay={index * 0.08}>
-                <article className="min-h-96 border border-white/10 bg-black/64 p-8 shadow-hard backdrop-blur-sm">
-                  <card.icon className="h-9 w-9 text-signal" />
-                  <h3 className="mt-16 text-4xl font-black leading-none text-white">{card.title}</h3>
-                  <p className="mt-6 text-base font-medium leading-8 text-white/62">{card.text}</p>
-                </article>
-              </BuildBlock>
-            ))}
-          </div>
+        <div className="absolute bottom-6 left-1/2 -translate-x-1/2 text-[0.6rem] uppercase tracking-widest2 text-white/50">
+          Scroll
         </div>
       </section>
 
-      <section className="relative overflow-hidden bg-[#f4f2eb] px-6 py-32 text-iron sm:px-10 lg:px-16 lg:py-44">
-        <div className="absolute inset-x-0 top-0 h-2 bg-signal" aria-hidden="true" />
-        <div className="absolute inset-0 opacity-[0.12] structure-shadow" aria-hidden="true" />
-        <div className="relative mx-auto grid max-w-7xl gap-16 lg:grid-cols-[1.1fr_0.9fr] lg:items-end">
-          <BuildBlock>
-            <div>
-              <p className="text-sm font-black uppercase tracking-[0.34em] text-iron/60">
-                Philosophy
-              </p>
-              <h2 className="mt-8 font-display text-7xl font-bold leading-[0.9] sm:text-8xl lg:text-9xl">
-                FULL
-                <br />
-                SUPPORT.
-              </h2>
-            </div>
-          </BuildBlock>
+      {/* ③ 井上組について */}
+      <section className="relative overflow-hidden bg-ink px-5 py-24 sm:px-8 lg:px-12 lg:py-32">
+        <div className="mx-auto grid max-w-content gap-14 lg:grid-cols-[1fr_1fr] lg:items-center">
+          <div>
+            <SectionHeading
+              eyebrow="About"
+              title="京都で信頼され、選ばれる足場会社へ。"
+              lead="「足場は、すべての工事の土台です。」目立たない仕事だからこそ、私たちは段取り・安全・美しさにこだわります。井上組は若く勢いのあるチームでありながら、一級とび技能士の確かな技術で、元請会社・協力会社の皆さまから「任せて安心」と言っていただける仕事を積み重ねてきました。"
+            />
+            <Reveal delay={0.15}>
+              <Link
+                href="/about"
+                className="mt-8 inline-flex items-center gap-2 text-sm font-bold text-brass transition hover:gap-3"
+              >
+                会社概要を見る
+                <ArrowRight className="h-4 w-4" />
+              </Link>
+            </Reveal>
+          </div>
 
-          <BuildBlock delay={0.1}>
-            <div className="grid gap-4">
-              {["安全第一", "工程遵守", "近隣配慮"].map((item) => (
-                <div key={item} className="flex items-center gap-5 border-b border-iron/18 py-8">
-                  <CheckCircle2 className="h-8 w-8 text-signal" />
-                  <span className="text-4xl font-black leading-none">{item}</span>
+          <Reveal delay={0.1}>
+            <div className="grid grid-cols-2 gap-4">
+              {stats.map((s) => (
+                <div
+                  key={s.label}
+                  className="border border-white/10 bg-charcoal/60 p-6"
+                >
+                  <p className="font-display text-3xl font-bold text-brass sm:text-4xl">
+                    {s.isText ? (
+                      <span className="text-xl sm:text-2xl">{s.suffix}</span>
+                    ) : (
+                      <CountUp end={s.value} suffix={s.suffix} />
+                    )}
+                  </p>
+                  <p className="mt-3 text-sm text-white/70">{s.label}</p>
                 </div>
               ))}
             </div>
-          </BuildBlock>
+          </Reveal>
         </div>
       </section>
 
-      <FinalCta />
-
-      <section id="contact" className="bg-iron px-6 py-32 sm:px-10 lg:px-16 lg:py-40">
-        <div className="mx-auto grid max-w-7xl gap-16 border-t border-white/12 pt-14 lg:grid-cols-[1fr_420px]">
-          <div>
-            <p className="text-sm font-black uppercase tracking-[0.34em] text-signal">Contact</p>
-            <h2 className="mt-8 font-display text-7xl font-bold leading-[0.9] text-white sm:text-8xl">
-              現場相談を
-              <br />
-              ここから。
-            </h2>
-          </div>
-          <div className="grid gap-4 text-base font-bold leading-8 text-white/68">
-            <InfoRow label="会社名" value="株式会社 井上組（仮）" />
-            <InfoRow label="住所" value="〒000-0000 住所を後ほど追記" />
-            <InfoRow label="電話" value="000-0000-0000" />
-            <InfoRow label="対応エリア" value="対応エリアを後ほど追記" />
+      {/* ④ 事業内容 */}
+      <section className="border-t border-white/10 bg-charcoal px-5 py-24 sm:px-8 lg:px-12 lg:py-32">
+        <div className="mx-auto max-w-content">
+          <SectionHeading
+            eyebrow="Services"
+            title="事業内容"
+            lead="戸建てから中低層ビルまで、あらゆる現場に対応する足場・鳶工事。"
+          />
+          <div className="mt-14 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+            {services.map((s, i) => (
+              <Reveal key={s.slug} delay={i * 0.06}>
+                <Link
+                  href={`/services#${s.slug}`}
+                  className="group flex h-full flex-col overflow-hidden border border-white/10 bg-ink/40 transition hover:border-brass/60"
+                >
+                  <div className="relative aspect-[16/10] overflow-hidden">
+                    <Image
+                      src={s.image}
+                      alt={s.imageAlt}
+                      fill
+                      sizes="(max-width:768px) 100vw, 33vw"
+                      className="object-cover transition duration-700 group-hover:scale-105"
+                      style={{ filter: "grayscale(0.3) brightness(0.7)" }}
+                    />
+                  </div>
+                  <div className="flex flex-1 flex-col p-6">
+                    <p className="font-display text-[0.65rem] uppercase tracking-widest2 text-brass">
+                      {s.titleEn}
+                    </p>
+                    <h3 className="mt-2 flex items-center justify-between font-serif text-xl font-bold text-white">
+                      {s.title}
+                      <ArrowUpRight className="h-5 w-5 text-brass transition group-hover:translate-x-1 group-hover:-translate-y-1" />
+                    </h3>
+                    <p className="mt-3 text-sm leading-7 text-white/65">{s.lead}</p>
+                  </div>
+                </Link>
+              </Reveal>
+            ))}
           </div>
         </div>
       </section>
-    </main>
-  );
-}
 
-function FinalCta() {
-  return (
-    <section className="relative flex min-h-[76vh] items-center justify-center overflow-hidden px-6 py-32 text-center sm:px-10 lg:px-16 lg:py-44">
-      <img
-        src="/images/final-cta.png"
-        alt=""
-        className="absolute inset-0 h-full w-full object-cover"
-      />
-      <div className="absolute inset-0 bg-black/65" />
-      <div className="relative z-10 mx-auto max-w-6xl">
-        <BuildBlock>
-          <p className="text-sm font-black uppercase tracking-[0.34em] text-white/62">
-            Join Inoue-gumi
-          </p>
-          <h2 className="mt-8 font-display text-6xl font-bold leading-[0.92] text-white sm:text-8xl lg:text-[10rem]">
-            この現場に、
-            <br />
-            来るか。
-          </h2>
-          <a
-            href="#contact"
-            className="mt-12 inline-flex items-center justify-center border border-white bg-transparent px-10 py-5 text-sm font-black uppercase tracking-[0.22em] text-white transition hover:bg-white hover:text-black"
-          >
-            ENTRY
-          </a>
-        </BuildBlock>
-      </div>
-    </section>
-  );
-}
+      {/* ⑤ 施工実績 */}
+      <section className="bg-ink px-5 py-24 sm:px-8 lg:px-12 lg:py-32">
+        <div className="mx-auto max-w-content">
+          <div className="flex flex-wrap items-end justify-between gap-6">
+            <SectionHeading
+              eyebrow="Works"
+              title="施工実績"
+              lead="京都府全域で手がけた足場・鳶工事の一部をご紹介します。"
+            />
+            <Reveal>
+              <Link
+                href="/works"
+                className="inline-flex items-center gap-2 text-sm font-bold text-brass transition hover:gap-3"
+              >
+                実績一覧を見る
+                <ArrowRight className="h-4 w-4" />
+              </Link>
+            </Reveal>
+          </div>
 
-function LookSection() {
-  return (
-    <section className="bg-black px-6 py-24 sm:px-10 lg:px-16 lg:py-32">
-      <div className="mx-auto max-w-7xl">
-        <div className="grid gap-10 lg:grid-cols-3">
-          {lookImages.map((image, index) => (
-            <BuildBlock key={image.src} delay={index * 0.06}>
-              <figure className="group">
-                <div className="aspect-[4/5] overflow-hidden bg-black">
-                  <img
-                    src={image.src}
-                    alt={image.alt}
-                    className="h-full w-full object-cover transition duration-700 ease-out group-hover:scale-105"
-                  />
-                </div>
-                <figcaption className="mt-5 text-[0.68rem] font-black uppercase tracking-[0.34em] text-white/42">
-                  INOUE-GUMI
-                </figcaption>
-              </figure>
-            </BuildBlock>
-          ))}
+          <div className="mt-14 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+            {works.slice(0, 3).map((w, i) => (
+              <Reveal key={w.slug} delay={i * 0.06}>
+                <Link
+                  href={`/works#${w.slug}`}
+                  className="group block overflow-hidden border border-white/10"
+                >
+                  <div className="relative aspect-[4/3] overflow-hidden">
+                    <Image
+                      src={w.images[0].src}
+                      alt={w.images[0].alt}
+                      fill
+                      sizes="(max-width:768px) 100vw, 33vw"
+                      className="object-cover transition duration-700 group-hover:scale-105"
+                      style={{ filter: "grayscale(0.2)" }}
+                    />
+                    <span className="absolute left-4 top-4 bg-brass px-3 py-1 text-[0.7rem] font-black text-ink">
+                      {w.categoryLabel}
+                    </span>
+                  </div>
+                  <div className="bg-charcoal p-5">
+                    <h3 className="font-serif text-lg font-bold text-white">
+                      {w.title}
+                    </h3>
+                    <p className="mt-2 flex items-center gap-2 text-sm text-white/60">
+                      <MapPin className="h-4 w-4 text-brass" />
+                      {w.location} ／ {w.date}
+                    </p>
+                  </div>
+                </Link>
+              </Reveal>
+            ))}
+          </div>
         </div>
-      </div>
-    </section>
-  );
-}
+      </section>
 
-function MusicController() {
-  const audioRef = useRef<HTMLAudioElement | null>(null);
-  const [isPlaying, setIsPlaying] = useState(false);
-
-  const toggleAudio = async () => {
-    const audio = audioRef.current;
-    if (!audio) return;
-
-    if (audio.paused) {
-      await audio.play();
-      setIsPlaying(true);
-      return;
-    }
-
-    audio.pause();
-    setIsPlaying(false);
-  };
-
-  return (
-    <div className="fixed bottom-4 right-4 z-50 sm:bottom-6 sm:right-6">
-      <audio
-        ref={audioRef}
-        src="/audio/gatts-baby.mp3"
-        preload="metadata"
-        onEnded={() => setIsPlaying(false)}
-      />
-      <button
-        type="button"
-        onClick={toggleAudio}
-        className="group flex h-14 min-w-14 items-center gap-3 border border-white/15 bg-black/82 px-4 text-sm font-black text-white shadow-hard backdrop-blur-xl transition hover:border-signal hover:bg-white hover:text-iron"
-        aria-label={isPlaying ? "音楽を停止" : "音楽を再生"}
-        title={isPlaying ? "音楽を停止" : "音楽を再生"}
-      >
-        <Volume2 className="h-5 w-5 text-signal group-hover:text-iron" />
-        <span className="hidden sm:inline">Gatts Baby</span>
-        {isPlaying ? <Pause className="h-5 w-5" /> : <Play className="h-5 w-5" />}
-      </button>
-    </div>
-  );
-}
-
-function SiteNav() {
-  return (
-    <header className="fixed inset-x-0 top-0 z-50 border-b border-white/8 bg-black/72 backdrop-blur-xl">
-      <nav className="mx-auto flex h-24 max-w-7xl items-center justify-between px-6 sm:px-10 lg:px-16">
-        <a href="#home" className="font-display text-3xl font-bold text-white">
-          井上組
-        </a>
-        <div className="hidden items-center gap-1 md:flex">
-          {navItems.map((item) => (
-            <a
-              key={item}
-              href={`#${item.toLowerCase()}`}
-              className="px-5 py-3 text-xs font-black uppercase tracking-[0.24em] text-white/62 transition hover:bg-white/8 hover:text-white"
-            >
-              {item}
-            </a>
-          ))}
-        </div>
-        <a
-          href="#contact"
-          className="clip-slab bg-signal px-6 py-4 text-sm font-black uppercase tracking-[0.16em] text-iron transition hover:bg-white"
-        >
-          Contact
-        </a>
-      </nav>
-    </header>
-  );
-}
-
-function HeroImageStage() {
-  return (
-    <div className="relative h-full w-full">
-      <img
-        src="/images/hero-scaffold.png"
-        alt=""
-        className="h-full w-full object-cover"
-      />
-      <div className="absolute inset-0 bg-black/55" />
-    </div>
-  );
-}
-
-function SectionShell({
-  id,
-  eyebrow,
-  title,
-  children
-}: {
-  id: string;
-  eyebrow: string;
-  title: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <section id={id} className="bg-iron px-6 py-32 sm:px-10 lg:px-16 lg:py-44">
-      <div className="mx-auto max-w-7xl">
-        <BuildBlock>
-          <div className="mb-20 flex flex-col justify-between gap-10 border-b border-white/10 pb-12 lg:flex-row lg:items-end">
-            <div>
-              <p className="text-sm font-black uppercase tracking-[0.34em] text-signal">{eyebrow}</p>
-              <h2 className="mt-8 font-display text-7xl font-bold leading-[0.9] text-white sm:text-8xl lg:text-9xl">
-                {title}
-              </h2>
+      {/* ⑥ 代表メッセージ */}
+      <section className="relative overflow-hidden border-y border-white/10 bg-charcoal px-5 py-24 sm:px-8 lg:px-12 lg:py-32">
+        <div className="mx-auto grid max-w-content gap-12 lg:grid-cols-[0.8fr_1.2fr] lg:items-center">
+          <Reveal>
+            <div className="relative aspect-[4/5] overflow-hidden border border-white/10">
+              <PhotoPlaceholder label="代表写真 準備中" monogram="井上" />
             </div>
-            <p className="max-w-lg text-lg font-bold leading-9 text-white/62">
-              後から実績写真、施工動画、スクロール連動の立体演出を追加しやすい、余白を大きく取ったグリッドです。
-            </p>
+          </Reveal>
+          <div>
+            <SectionHeading
+              eyebrow="Message"
+              title="一つひとつの現場に、誠実に。"
+            />
+            <Reveal delay={0.1}>
+              <p className="mt-6 text-base leading-9 text-white/75">
+                足場は、完成すれば隠れてしまう仕事です。それでも私たちは、見えない部分にこそ会社の姿勢が表れると信じています。安全で、美しく、次の職人が働きやすい足場を組むこと。それが井上組の誇りです。
+              </p>
+              <p className="mt-6 text-sm text-white/60">
+                代表取締役　{site.representative}
+              </p>
+              <Link
+                href="/message"
+                className="mt-8 inline-flex items-center gap-2 text-sm font-bold text-brass transition hover:gap-3"
+              >
+                代表挨拶を読む
+                <ArrowRight className="h-4 w-4" />
+              </Link>
+            </Reveal>
           </div>
-        </BuildBlock>
-        {children}
-      </div>
-    </section>
+        </div>
+      </section>
+
+      {/* ⑦ 採用情報 */}
+      <section className="relative overflow-hidden px-5 py-24 sm:px-8 lg:px-12 lg:py-32">
+        <Image
+          src="/images/look-site.png"
+          alt=""
+          fill
+          sizes="100vw"
+          className="object-cover"
+          style={{ filter: "grayscale(0.5) brightness(0.35)" }}
+        />
+        <div className="absolute inset-0 bg-ink/70" aria-hidden="true" />
+        <div className="relative mx-auto max-w-content">
+          <SectionHeading
+            eyebrow="Recruit"
+            title="京都で、街を支える仲間を。"
+            lead="未経験から一級とび技能士へ。頑張りをきちんと評価する環境で、手に職をつけませんか。井上組は若く勢いのあるチームで、新しい仲間を歓迎します。"
+          />
+          <Reveal delay={0.1}>
+            <Link
+              href="/recruit"
+              className="mt-8 inline-flex items-center gap-2 bg-brass px-8 py-4 text-sm font-black text-ink transition hover:bg-brass-light"
+            >
+              採用情報を見る
+              <ArrowRight className="h-4 w-4" />
+            </Link>
+          </Reveal>
+        </div>
+      </section>
+
+      {/* ⑧ 会社概要（要約） */}
+      <section className="bg-ink px-5 py-24 sm:px-8 lg:px-12 lg:py-32">
+        <div className="mx-auto grid max-w-content gap-12 lg:grid-cols-[1fr_1.1fr] lg:items-start">
+          <div>
+            <SectionHeading eyebrow="Company" title="会社概要" />
+            <Reveal delay={0.1}>
+              <div className="mt-8 flex flex-col gap-5">
+                <Feature icon={Award} title="一級とび技能士在籍" text="確かな国家資格と技術。" />
+                <Feature icon={ShieldCheck} title={site.license} text="京都府知事許可。安心の有資格施工。" />
+                <Feature icon={Clock} title={`営業時間 ${site.businessHours}`} text={`対応エリア：${site.serviceArea}`} />
+              </div>
+              <Link
+                href="/about"
+                className="mt-8 inline-flex items-center gap-2 text-sm font-bold text-brass transition hover:gap-3"
+              >
+                詳しい会社概要を見る
+                <ArrowRight className="h-4 w-4" />
+              </Link>
+            </Reveal>
+          </div>
+
+          <Reveal delay={0.1}>
+            <dl className="divide-y divide-white/10 border border-white/10">
+              <Row label="会社名" value={site.companyName} />
+              <Row label="代表者" value={`${site.representativeRole}　${site.representative}`} />
+              <Row label="所在地" value={`〒${site.postalCode}　${site.address}`} />
+              <Row label="電話" value={`${site.tel}（TEL/FAX）`} />
+              <Row label="事業内容" value={site.tagline} />
+              <Row label="許可番号" value={site.license} />
+            </dl>
+          </Reveal>
+        </div>
+      </section>
+
+      {/* ⑨ お問い合わせ */}
+      <CtaSection />
+    </>
   );
 }
 
-function BuildBlock({
-  children,
-  delay = 0
+function Feature({
+  icon: Icon,
+  title,
+  text,
 }: {
-  children: React.ReactNode;
-  delay?: number;
+  icon: React.ComponentType<{ className?: string }>;
+  title: string;
+  text: string;
 }) {
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 24 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, amount: 0.24 }}
-      transition={{ delay, duration: 0.62, ease: [0.22, 1, 0.36, 1] }}
-      className="origin-bottom"
-    >
-      {children}
-    </motion.div>
+    <div className="flex items-start gap-4">
+      <span className="flex h-11 w-11 shrink-0 items-center justify-center border border-brass/40 text-brass">
+        <Icon className="h-5 w-5" />
+      </span>
+      <div>
+        <p className="font-bold text-white">{title}</p>
+        <p className="mt-1 text-sm text-white/60">{text}</p>
+      </div>
+    </div>
   );
 }
 
-function InfoRow({ label, value }: { label: string; value: string }) {
+function Row({ label, value }: { label: string; value: string }) {
   return (
-    <div className="grid grid-cols-[104px_1fr] gap-6 border-b border-white/10 py-5">
-      <span className="font-black text-signal">{label}</span>
-      <span>{value}</span>
+    <div className="grid grid-cols-[7rem_1fr] gap-4 px-5 py-4 text-sm sm:grid-cols-[9rem_1fr]">
+      <dt className="font-bold text-brass">{label}</dt>
+      <dd className="text-white/80">{value}</dd>
     </div>
   );
 }

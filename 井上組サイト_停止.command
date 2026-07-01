@@ -3,8 +3,12 @@
 echo "井上組 公式サイト テスト停止"
 echo "--------------------------------"
 
-# このスクリプト自身が置かれているフォルダを自動的にプロジェクトの場所にします。
-PROJECT_DIR="${0:A:h}"
+SCRIPT_DIR="${0:A:h}"
+if [ -f "${SCRIPT_DIR}/package.json" ]; then
+  PROJECT_DIR="${SCRIPT_DIR}"
+else
+  PROJECT_DIR="/Users/ks/Documents/井上組"
+fi
 PID_FILE="${PROJECT_DIR}/dev-server.pid"
 PORT="3001"
 
@@ -14,14 +18,10 @@ if [ -f "${PID_FILE}" ]; then
     kill "${SERVER_PID}" >/dev/null 2>&1
     echo "起動中のサーバーを停止しました。"
   fi
-  rm -f "${PID_FILE}"
+  rm -f "${PID_FILE}" 2>/dev/null
 fi
 
-pkill -f "next dev --hostname 127.0.0.1 --port 3001" >/dev/null 2>&1
-pkill -f "next dev --hostname 0.0.0.0 --port 3001" >/dev/null 2>&1
-pkill -f "npm run dev --hostname 127.0.0.1 --port 3001" >/dev/null 2>&1
-pkill -f "npm run dev --hostname 0.0.0.0 --port 3001" >/dev/null 2>&1
-
+# ポートを使っている残りプロセスも停止
 PORT_PIDS="$(lsof -ti tcp:${PORT} 2>/dev/null || true)"
 if [ -n "${PORT_PIDS}" ]; then
   for PORT_PID in ${(f)PORT_PIDS}; do
