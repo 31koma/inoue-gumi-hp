@@ -1,8 +1,10 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // 以前のアプリ側起動で作られた ".next" がロックされて書き換えできないため、
-  // 新しいビルド用フォルダ ".next-dev" を使うように変更しています。
-  distDir: ".next-dev",
+  // ローカルで「テスト起動」中は .next がロックされるため、
+  // 開発時(next dev)だけ別フォルダ ".next-dev" を使います。
+  // 本番ビルド(next build / Vercel)は既定の ".next" を使うようにし、
+  // Vercelが routes-manifest.json を見つけられるようにします。
+  distDir: process.env.NODE_ENV === "development" ? ".next-dev" : ".next",
 };
 
 export default nextConfig;
